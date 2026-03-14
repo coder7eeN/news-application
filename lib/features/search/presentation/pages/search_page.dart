@@ -22,8 +22,45 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class _SearchView extends StatelessWidget {
+class _SearchView extends StatefulWidget {
   const _SearchView();
+
+  @override
+  State<_SearchView> createState() => _SearchViewState();
+}
+
+class _SearchViewState extends State<_SearchView> {
+  final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isNearBottom) {
+      context.read<SearchBloc>().add(const SearchLoadMore());
+    }
+  }
+
+  bool get _isNearBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    const scrollThreshold = 0.8;
+    return currentScroll >= maxScroll * scrollThreshold;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +68,14 @@ class _SearchView extends StatelessWidget {
       appBar: AppBar(
         title: TextField(
           autofocus: true,
+          style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: 'Search articles...',
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             border: InputBorder.none,
-            prefixIcon: const Icon(Icons.search),
+            prefixIcon: const Icon(Icons.search, color: Colors.white),
             suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.clear, color: Colors.white),
               onPressed: () {
                 context.read<SearchBloc>().add(const SearchQueryChanged(''));
               },
@@ -48,7 +87,24 @@ class _SearchView extends StatelessWidget {
         ),
       ),
       body: OfflineBanner(
-        child: BlocBuilder<SearchBloc, SearchState>(
+        child: BlocConsumer<SearchBloc, SearchState>(
+          listener: (context, state) {
+            if (state is SearchLoaded && state.paginationError != null) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.paginationError!),
+                    action: SnackBarAction(
+                      label: 'Retry',
+                      onPressed: () => context.read<SearchBloc>().add(
+                        const SearchLoadMore(),
+                      ),
+                    ),
+                  ),
+                );
+            }
+          },
           builder: (context, state) {
             if (state is SearchInitial) {
               return const Center(child: Text('Search for news articles'));
@@ -57,19 +113,27 @@ class _SearchView extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is SearchLoaded) {
+              final itemCount = state.isLoadingMore
+                  ? state.articles.length + 1
+                  : state.articles.length;
               return ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(8),
-                itemCount: state.articles.length,
+                itemCount: itemCount,
                 itemBuilder: (context, index) {
+                  if (index >= state.articles.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   final article = state.articles[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: ArticleCard(
                       article: article,
-                      onTap: () => context.push(
-                        AppRouter.articleDetail,
-                        extra: article,
-                      ),
+                      onTap: () =>
+                          context.push(AppRouter.articleDetail, extra: article),
                     ),
                   );
                 },

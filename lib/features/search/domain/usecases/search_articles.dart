@@ -9,6 +9,8 @@ class SearchArticlesUseCase {
 
   const SearchArticlesUseCase(this.repository);
 
-  Future<Either<Failure, List<Article>>> call(String query) =>
-      repository.searchArticles(query);
+  Future<Either<Failure, (List<Article>, int)>> call(
+    String query, {
+    int page = 1,
+  }) => repository.searchArticles(query, page);
 }

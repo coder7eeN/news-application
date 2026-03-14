@@ -14,7 +14,7 @@ class SearchInitial extends SearchState {
   List<Object> get props => [];
 }
 
-/// Loading state — spinner
+/// Loading state — spinner (first page only)
 class SearchLoading extends SearchState {
   const SearchLoading();
 
@@ -22,14 +22,46 @@ class SearchLoading extends SearchState {
   List<Object> get props => [];
 }
 
-/// Loaded state — results list
+/// Loaded state — results list with pagination support
 class SearchLoaded extends SearchState {
   final List<Article> articles;
+  final int totalResults;
+  final bool hasReachedMax;
+  final bool isLoadingMore;
+  final String? paginationError;
 
-  const SearchLoaded({required this.articles});
+  const SearchLoaded({
+    required this.articles,
+    this.totalResults = 0,
+    this.hasReachedMax = false,
+    this.isLoadingMore = false,
+    this.paginationError,
+  });
+
+  SearchLoaded copyWith({
+    List<Article>? articles,
+    int? totalResults,
+    bool? hasReachedMax,
+    bool? isLoadingMore,
+    String? paginationError,
+  }) {
+    return SearchLoaded(
+      articles: articles ?? this.articles,
+      totalResults: totalResults ?? this.totalResults,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      paginationError: paginationError,
+    );
+  }
 
   @override
-  List<Object> get props => [articles];
+  List<Object?> get props => [
+        articles,
+        totalResults,
+        hasReachedMax,
+        isLoadingMore,
+        paginationError,
+      ];
 }
 
 /// Empty state — no results found
