@@ -19,14 +19,17 @@ class SearchRepositoryImpl implements ISearchRepository {
   });
 
   @override
-  Future<Either<Failure, List<Article>>> searchArticles(String query) async {
+  Future<Either<Failure, (List<Article>, int)>> searchArticles(
+    String query,
+    int page,
+  ) async {
     if (!await networkInfo.isConnected) {
       return const Left(NoInternetFailure());
     }
 
     try {
-      final articles = await remoteDataSource.searchArticles(query);
-      return Right(articles);
+      final result = await remoteDataSource.searchArticles(query, page);
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on TimeoutException {

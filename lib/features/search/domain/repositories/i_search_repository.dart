@@ -4,5 +4,9 @@ import 'package:news_app/features/news_feed/domain/entities/article.dart';
 
 /// Repository interface for search operations
 abstract class ISearchRepository {
-  Future<Either<Failure, List<Article>>> searchArticles(String query);
+  /// Returns (articles, totalResults)
+  Future<Either<Failure, (List<Article>, int)>> searchArticles(
+    String query,
+    int page,
+  );
 }

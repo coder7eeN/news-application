@@ -14,3 +14,11 @@ class SearchQueryChanged extends SearchEvent {
   @override
   List<Object> get props => [query];
 }
+
+/// Dispatched to load the next page of search results
+class SearchLoadMore extends SearchEvent {
+  const SearchLoadMore();
+
+  @override
+  List<Object> get props => [];
+}
