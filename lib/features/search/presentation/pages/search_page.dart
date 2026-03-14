@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/core/di/injection_container.dart';
+import 'package:news_app/core/widgets/error_view.dart';
+import 'package:news_app/core/widgets/offline_banner.dart';
 import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
@@ -44,44 +46,49 @@ class _SearchView extends StatelessWidget {
           },
         ),
       ),
-      body: BlocBuilder<SearchBloc, SearchState>(
-        builder: (context, state) {
-          if (state is SearchInitial) {
-            return const Center(child: Text('Search for news articles'));
-          }
-          if (state is SearchLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is SearchLoaded) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: state.articles.length,
-              itemBuilder: (context, index) {
-                final article = state.articles[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: ArticleCard(
-                    article: article,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            ArticleDetailPage(article: article),
+      body: OfflineBanner(
+        child: BlocBuilder<SearchBloc, SearchState>(
+          builder: (context, state) {
+            if (state is SearchInitial) {
+              return const Center(child: Text('Search for news articles'));
+            }
+            if (state is SearchLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is SearchLoaded) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: state.articles.length,
+                itemBuilder: (context, index) {
+                  final article = state.articles[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: ArticleCard(
+                      article: article,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              ArticleDetailPage(article: article),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-          if (state is SearchEmpty) {
-            return const Center(child: Text('No articles found'));
-          }
-          if (state is SearchError) {
-            return Center(child: Text(state.message));
-          }
-          return const SizedBox.shrink();
-        },
+                  );
+                },
+              );
+            }
+            if (state is SearchEmpty) {
+              return const ErrorView(
+                message: 'No articles found',
+                icon: Icons.search_off,
+              );
+            }
+            if (state is SearchError) {
+              return ErrorView(message: state.message);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

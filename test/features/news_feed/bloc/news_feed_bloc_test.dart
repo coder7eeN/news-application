@@ -124,7 +124,7 @@ void main() {
     );
 
     blocTest<NewsFeedBloc, NewsFeedState>(
-      'preserves existing articles on pagination failure',
+      'emits paginationError on pagination failure',
       build: () {
         when(() => mockUseCase(any()))
             .thenAnswer((_) async => const Left(ServerFailure()));
@@ -134,7 +134,10 @@ void main() {
       act: (b) => b.add(const FetchNextPage()),
       expect: () => [
         NewsFeedLoaded(articles: tArticles, isLoadingMore: true),
-        NewsFeedLoaded(articles: tArticles),
+        NewsFeedLoaded(
+          articles: tArticles,
+          paginationError: 'Server error. Please try again.',
+        ),
       ],
     );
   });

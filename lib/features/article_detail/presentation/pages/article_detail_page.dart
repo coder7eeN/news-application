@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:news_app/core/di/injection_container.dart';
+import 'package:news_app/core/widgets/error_view.dart';
 import 'package:news_app/features/article_detail/presentation/notifier/article_detail_notifier.dart';
 import 'package:news_app/features/article_detail/presentation/notifier/article_detail_state.dart';
+import 'package:news_app/features/bookmark/presentation/notifier/bookmark_notifier.dart';
 import 'package:news_app/features/news_feed/domain/entities/article.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -46,7 +49,10 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
         if (state is ArticleDetailError) {
           return Scaffold(
             appBar: AppBar(),
-            body: Center(child: Text(state.message)),
+            body: ErrorView(
+              message: state.message,
+              onRetry: () => _notifier.loadArticle(widget.article),
+            ),
           );
         }
         return const SizedBox.shrink();
@@ -63,7 +69,22 @@ class _ArticleDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(article.sourceName)),
+      appBar: AppBar(
+        title: Text(article.sourceName),
+        actions: [
+          Consumer<BookmarkNotifier>(
+            builder: (context, notifier, _) {
+              final isBookmarked = notifier.isBookmarked(article.id);
+              return IconButton(
+                icon: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                ),
+                onPressed: () => notifier.toggleBookmark(article),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

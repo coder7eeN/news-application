@@ -33,13 +33,20 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
     emit(currentState.copyWith(isLoadingMore: true));
     final result = await getLatestArticles(_currentPage);
     result.fold(
-      (failure) => emit(currentState.copyWith(isLoadingMore: false)),
+      (failure) => emit(
+        currentState.copyWith(
+          isLoadingMore: false,
+          paginationError: failure.message,
+        ),
+      ),
       (newArticles) {
         _currentPage++;
-        emit(NewsFeedLoaded(
-          articles: [...currentState.articles, ...newArticles],
-          hasReachedMax: newArticles.length < CacheConstants.pageSize,
-        ));
+        emit(
+          NewsFeedLoaded(
+            articles: [...currentState.articles, ...newArticles],
+            hasReachedMax: newArticles.length < CacheConstants.pageSize,
+          ),
+        );
       },
     );
   }
@@ -55,15 +62,14 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
   Future<void> _fetchFirstPage(Emitter<NewsFeedState> emit) async {
     emit(const NewsFeedLoading());
     final result = await getLatestArticles(1);
-    result.fold(
-      (failure) => emit(NewsFeedError(failure.message)),
-      (articles) {
-        _currentPage = 2;
-        emit(NewsFeedLoaded(
+    result.fold((failure) => emit(NewsFeedError(failure.message)), (articles) {
+      _currentPage = 2;
+      emit(
+        NewsFeedLoaded(
           articles: articles,
           hasReachedMax: articles.length < CacheConstants.pageSize,
-        ));
-      },
-    );
+        ),
+      );
+    });
   }
 }

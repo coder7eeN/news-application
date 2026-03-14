@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/core/di/injection_container.dart';
+import 'package:news_app/core/widgets/error_view.dart';
+import 'package:news_app/core/widgets/offline_banner.dart';
+import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
+import 'package:news_app/features/bookmark/presentation/pages/bookmark_page.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_bloc.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_event.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_state.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
-import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/search/presentation/pages/search_page.dart';
 
 class NewsFeedPage extends StatelessWidget {
@@ -28,9 +31,18 @@ class NewsFeedPage extends StatelessWidget {
                 ),
               ),
             ),
+            IconButton(
+              icon: const Icon(Icons.bookmark),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const BookmarkPage(),
+                ),
+              ),
+            ),
           ],
         ),
-        body: const _NewsFeedView(),
+        body: const OfflineBanner(child: _NewsFeedView()),
       ),
     );
   }
@@ -76,7 +88,23 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NewsFeedBloc, NewsFeedState>(
+    return BlocConsumer<NewsFeedBloc, NewsFeedState>(
+      listener: (context, state) {
+        if (state is NewsFeedLoaded && state.paginationError != null) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.paginationError!),
+                action: SnackBarAction(
+                  label: 'Retry',
+                  onPressed: () =>
+                      context.read<NewsFeedBloc>().add(const FetchNextPage()),
+                ),
+              ),
+            );
+        }
+      },
       builder: (context, state) {
         if (state is NewsFeedLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -128,7 +156,12 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
           );
         }
         if (state is NewsFeedError) {
-          return Center(child: Text(state.message));
+          return ErrorView(
+            message: state.message,
+            icon: Icons.wifi_off,
+            onRetry: () =>
+                context.read<NewsFeedBloc>().add(const FetchLatestArticles()),
+          );
         }
         return const SizedBox.shrink();
       },
