@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
+import 'package:news_app/core/router/app_router.dart';
 import 'package:news_app/features/bookmark/presentation/notifier/bookmark_notifier.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
 
@@ -46,11 +47,9 @@ class BookmarkPage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: ArticleCard(
                   article: article,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => ArticleDetailPage(article: article),
-                    ),
+                  onTap: () => context.push(
+                    AppRouter.articleDetail,
+                    extra: article,
                   ),
                 ),
               );

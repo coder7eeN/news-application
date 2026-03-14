@@ -1,17 +1,29 @@
 import 'package:flutter/foundation.dart';
-import 'package:news_app/features/article_detail/presentation/notifier/article_detail_state.dart';
-import 'package:news_app/features/news_feed/domain/entities/article.dart';
 
-/// ValueNotifier for article detail screen
-/// Simple 3-state lifecycle: loading → loaded / error
-class ArticleDetailNotifier extends ValueNotifier<ArticleDetailState> {
-  ArticleDetailNotifier() : super(const ArticleDetailLoading());
+/// Tracks WebView loading state for the article detail screen
+class ArticleDetailNotifier {
+  /// true while Webview is loading the page
+  final ValueNotifier<bool> isLoading = ValueNotifier(true);
 
-  void loadArticle(Article article) {
-    value = ArticleDetailLoaded(article: article);
+  /// 0-100 progress for linear progress indicator
+  final ValueNotifier<int> progress = ValueNotifier(0);
+
+  void onPageStarted(String url) {
+    isLoading.value = true;
+    progress.value = 0;
   }
 
-  void setError(String message) {
-    value = ArticleDetailError(message);
+  void onProgress(int p) {
+    progress.value = p;
+  }
+
+  void onPageFinished(String url) {
+    isLoading.value = false;
+    progress.value = 100;
+  }
+
+  void dispose() {
+    isLoading.dispose();
+    progress.dispose();
   }
 }
