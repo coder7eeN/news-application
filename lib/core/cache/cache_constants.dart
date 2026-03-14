@@ -14,6 +14,9 @@ class CacheConstants {
   /// Maximum number of pages to cache
   static const int maxCachedPages = 5;
 
+  /// Number of articles per page from the API
+  static const int pageSize = 20;
+
   /// Generate cache key for a specific page
   static String feedCacheKey(int page) => 'feed_page_$page';
 }

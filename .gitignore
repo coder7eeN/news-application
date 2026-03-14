@@ -50,3 +50,6 @@ app.*.map.json
 /android/.idea/
 
 *.gitkeep
+
+/plans
+.claude

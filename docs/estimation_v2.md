@@ -21,8 +21,8 @@
 | Epic | User Stories | Total Story Points |
 |---|---|---|
 | EP-1 Foundation & CI/CD | US-01, US-02 | 8 |
-| EP-2 News Feed | US-03, US-04, US-05 | 16 |
-| EP-3 Search | US-06, US-07 | 11 |
+| EP-2 News Feed | US-03, US-04, US-05 | 15 |
+| EP-3 Search | US-06, US-07 | 12 |
 | EP-4 Article Detail | US-08 | 5 |
 | EP-5 Bookmarks | US-09, US-10 | 8 |
 | EP-6 Error Handling | US-11 | 5 |
@@ -87,15 +87,16 @@
 | ST-03-5 | Implement `NewsFeedRepositoryImpl` — wire `RemoteDataSource`, return `Either<Failure, List<Article>>` | 30m |
 | ST-03-6 | Implement `GetLatestArticlesUseCase` — single responsibility, calls repository interface | 20m |
 | ST-03-7 | Build `NewsFeedPage` and `ArticleCard` widget — display title, image, source, published date | 45m |
+| **ST-03-8** | **Unit tests: `GetLatestArticlesUseCase`** — returns correct data from repository, propagates failure on error | **30m** |
 
-**Total: ~3h 35m**
+**Total: ~4h 05m**
 
 ---
 
 ### US-04 — Paginate Through News Articles
 > **As a user**, I want to scroll down and automatically load more articles, so that I can read beyond the first page without any manual action.
 
-**Story Points: 5**
+**Story Points: 6**
 
 | # | Subtask | Estimate |
 |---|---|---|
@@ -104,15 +105,16 @@
 | ST-04-3 | Attach `ScrollController` to `ListView` — dispatch `FetchNextPage` when scroll reaches 80% | 30m |
 | ST-04-4 | Show pagination loading indicator at the bottom of the list during next-page fetch | 20m |
 | ST-04-5 | Handle `hasReachedMax` — stop dispatching `FetchNextPage` when API returns empty list | 20m |
+| **ST-04-6** | **Unit tests: `NewsFeedBloc`** — emits loading→loaded on success, emits error state on API failure, pagination appends articles correctly | **45m** |
 
-**Total: ~2h 30m**
+**Total: ~3h 15m**
 
 ---
 
 ### US-05 — Cache News Feed for Fast Loading
 > **As a user**, I want to see articles instantly when I open the app even before the API responds, so that the experience feels fast and never shows a blank screen.
 
-**Story Points: 6**
+**Story Points: 4**
 
 | # | Subtask | Estimate |
 |---|---|---|
@@ -120,12 +122,8 @@
 | ST-05-2 | Add TTL logic — store timestamp alongside cache data, check 15-minute expiry on every read | 30m |
 | ST-05-3 | Update `NewsFeedRepositoryImpl` — cache-first flow: serve Hive instantly → fetch API in background → update cache on success | 45m |
 | ST-05-4 | Handle pull-to-refresh — force API fetch, reset TTL, update UI with fresh data | 30m |
-| **ST-05-5** | **Unit tests: `NewsFeedBloc`** — emits loading→loaded on success, emits error state on API failure, pagination appends articles correctly | **45m** |
-| **ST-05-6** | **Unit tests: `GetLatestArticlesUseCase`** — returns cached data when offline (`NoInternetFailure`), fetches remote when cache is expired | **30m** |
 
-**Total: ~3h 45m**
-
-> ✅ Unit tests for `NewsFeedBloc` and `GetLatestArticlesUseCase` are written on Day 1 — same day the BLoC and UseCase are implemented — so CI catches regressions from the first PR.
+**Total: ~2h 30m**
 
 ---
 
@@ -136,7 +134,7 @@
 ### US-06 — Search Articles by Keyword
 > **As a user**, I want to type a keyword and see relevant articles, so that I can find news on specific topics I care about.
 
-**Story Points: 5**
+**Story Points: 6**
 
 | # | Subtask | Estimate |
 |---|---|---|
@@ -144,8 +142,9 @@
 | ST-06-2 | Implement `ISearchRepository` interface + `SearchRepositoryImpl` with `NetworkInfo` check | 30m |
 | ST-06-3 | Implement `SearchArticlesUseCase` | 15m |
 | ST-06-4 | Build `SearchPage` with `TextField`, results `ListView`, and loading / empty / error states | 45m |
+| **ST-06-5** | **Unit tests: `SearchArticlesUseCase`** — returns search results from repository, propagates failure on error, handles empty query | **30m** |
 
-**Total: ~2h 10m**
+**Total: ~2h 40m**
 
 ---
 
@@ -178,15 +177,16 @@
 | ST-08-3 | Integrate `webview_flutter` — load article URL, show linear loading progress indicator | 45m |
 | ST-08-4 | Handle WebView errors — fallback to open URL in external browser | 30m |
 | ST-08-5 | Register `ArticleDetailNotifier` in GetIt | 15m |
+| **ST-08-6** | **Unit tests: `ArticleDetailNotifier`** — emits loading→loaded on valid article, emits error state on failure | **20m** |
 
-**Total: ~2h 45m**
+**Total: ~3h 05m**
 
 ---
 
 ### US-09 — Bookmark Articles to Read Later
 > **As a user**, I want to save articles by tapping a bookmark icon, so that I can easily come back to read them later.
 
-**Story Points: 3**
+**Story Points: 5**
 
 | # | Subtask | Estimate |
 |---|---|---|
@@ -195,24 +195,24 @@
 | ST-09-3 | Expose `isBookmarked(String url)` for reactive icon state in feed and detail pages | 15m |
 | ST-09-4 | Add bookmark icon to `ArticleCard` — listens to `BookmarkNotifier`, updates instantly (optimistic UI) | 30m |
 | ST-09-5 | Register `BookmarkNotifier` as singleton in GetIt | 10m |
+| **ST-09-6** | **Unit tests: `BookmarkNotifier`** — toggle adds article correctly, toggle removes existing article, state persists to Hive | **45m** |
 
-**Total: ~2h**
+**Total: ~2h 45m**
 
 ---
 
 ### US-10 — Access Bookmarks Offline
 > **As a user**, I want my saved articles to be fully accessible without an internet connection, so that I can always read bookmarked content regardless of network status.
 
-**Story Points: 5**
+**Story Points: 3**
 
 | # | Subtask | Estimate |
 |---|---|---|
 | ST-10-1 | Load all bookmarks from Hive on app startup — pre-populate `BookmarkNotifier` before first frame renders | 20m |
 | ST-10-2 | Build `BookmarkPage` — list of saved articles using `BookmarkNotifier`, empty state if none saved | 45m |
 | ST-10-3 | Verify `BookmarkPage` is fully functional without network — reads only from Hive, no API calls | 20m |
-| **ST-10-4** | **Unit tests: `BookmarkNotifier`** — toggle adds article correctly, toggle removes existing article, state persists to Hive | **45m** |
 
-**Total: ~2h 10m**
+**Total: ~1h 25m**
 
 ---
 
@@ -312,11 +312,11 @@ ST-01-1  Project setup & folder structure
 | ST-04-2 Concurrency transformers | ST-04-1 `NewsFeedBloc` | Transformers are registered on BLoC events |
 | ST-03-7 `NewsFeedPage` UI | ST-04-1 `NewsFeedBloc` | Page consumes BLoC states |
 | ST-04-3 Scroll pagination | ST-03-7 `NewsFeedPage` | `ScrollController` added to the list widget |
+| ST-03-8 Unit tests: `GetLatestArticlesUseCase` | ST-03-6 UseCase | UseCase must exist before it can be tested |
+| ST-04-6 Unit tests: `NewsFeedBloc` | ST-04-1 `NewsFeedBloc` | BLoC must exist before it can be tested |
 | ST-05-1 `LocalDataSource` | ST-01-5 Hive setup | Reads/writes to Hive box |
 | ST-05-2 TTL logic | ST-05-1 `LocalDataSource` | TTL wraps LocalDataSource reads |
 | ST-05-3 Cache-first in Repository | ST-05-1, ST-05-2, ST-03-5 | Extends RepositoryImpl with cache layer |
-| ST-05-5 Unit tests: `NewsFeedBloc` | ST-04-1 `NewsFeedBloc` | BLoC must exist before it can be tested |
-| ST-05-6 Unit tests: `GetLatestArticlesUseCase` | ST-03-6 UseCase, ST-05-3 Cache-first | Tests the full offline + cache flow |
 
 ---
 
@@ -327,6 +327,7 @@ ST-01-1  Project setup & folder structure
 | ST-06-1 `SearchRemoteDataSource` | ST-01-4 Dio, ST-03-2 `ArticleModel` | Reuses Dio client and existing ArticleModel |
 | ST-06-2 `SearchRepositoryImpl` | ST-06-1, ST-01-6 NetworkInfo | Needs datasource + connectivity check |
 | ST-06-3 `SearchArticlesUseCase` | ST-06-2 `ISearchRepository` | UseCase depends on repository interface |
+| ST-06-5 Unit tests: `SearchArticlesUseCase` | ST-06-3 UseCase | UseCase must exist before it can be tested |
 | ST-07-1 `SearchBloc` | ST-06-3 UseCase | BLoC calls UseCase |
 | ST-07-2 Debounce logic | ST-07-1 `SearchBloc` | Debounce applied inside BLoC event handler |
 | ST-07-3 `CancelToken` integration | ST-06-1 `SearchRemoteDataSource` | Must modify datasource method signature |
@@ -343,6 +344,7 @@ ST-01-1  Project setup & folder structure
 | ST-08-2 `ArticleDetailPage` | ST-08-1 `ArticleDetailNotifier` | Page listens to notifier state |
 | ST-08-3 WebView integration | ST-08-2 `ArticleDetailPage` | WebView is embedded inside the page |
 | ST-08-4 WebView error fallback | ST-08-3 WebView | Fallback handles WebView failure events |
+| ST-08-6 Unit tests: `ArticleDetailNotifier` | ST-08-1 `ArticleDetailNotifier` | Notifier must exist before it can be tested |
 
 ---
 
@@ -354,10 +356,10 @@ ST-01-1  Project setup & folder structure
 | ST-09-2 `toggleBookmark` | ST-09-1 `BookmarkNotifier` | Method lives inside the notifier |
 | ST-09-3 `isBookmarked` | ST-09-1 `BookmarkNotifier` | Query method on notifier state |
 | ST-09-4 Bookmark icon in `ArticleCard` | ST-09-1, ST-09-3 | Card calls `isBookmarked` and `toggleBookmark` |
+| ST-09-6 Unit tests: `BookmarkNotifier` | ST-09-1, ST-09-2 | Tests toggle + Hive persistence after notifier is complete |
 | ST-10-1 Load bookmarks on startup | ST-09-1 `BookmarkNotifier` | Requires notifier singleton to be registered |
 | ST-10-2 `BookmarkPage` | ST-09-1, ST-10-1 | Page renders the notifier's article list |
 | ST-10-3 Offline verification | ST-10-2 `BookmarkPage` | Requires completed UI to verify offline behavior |
-| ST-10-4 Unit tests: `BookmarkNotifier` | ST-09-1, ST-09-2 | Tests toggle + Hive persistence after notifier is complete |
 
 ---
 
@@ -370,7 +372,7 @@ ST-01-1  Project setup & folder structure
 | ST-11-4 Failure → message mapping | ST-01-7, ST-11-2 | Requires widget + all Failure subtypes defined |
 | ST-11-5 End-to-end error verification | All feature pages complete | Requires Feed, Search, Detail pages to exist |
 | ST-12-1 `--dart-define` in Dio | ST-01-4 Dio client | Updates existing Dio configuration |
-| ST-13-1 Full test suite | All unit test subtasks (ST-05-5, ST-05-6, ST-07-5, ST-10-4) | All tests must exist before final CI run |
+| ST-13-1 Full test suite | All unit test subtasks (ST-03-8, ST-04-6, ST-06-5, ST-07-5, ST-08-6, ST-09-6) | All tests must exist before final CI run |
 | ST-13-2 Smoke test | All feature pages complete | Requires all UI screens to be functional |
 | ST-13-3 README | ST-12-1, ST-12-2 | Documents `--dart-define` usage — needs security step done first |
 
@@ -400,8 +402,8 @@ Search, Article Detail, and Bookmarks share only the `Article` entity — they d
 | Day | Epics Covered | User Stories | Est. Hours |
 |---|---|---|---|
 | Day 1 | EP-1 Foundation + CI/CD, EP-2 News Feed (+ unit tests) | US-01, US-02, US-03, US-04, US-05 | ~9h |
-| Day 2 | EP-3 Search (+ unit tests), EP-4 Article Detail, EP-5 Bookmarks (+ unit tests) | US-06, US-07, US-08, US-09, US-10 | ~9h |
+| Day 2 | EP-3 Search (+ unit tests), EP-4 Article Detail (+ unit tests), EP-5 Bookmarks (+ unit tests) | US-06, US-07, US-08, US-09, US-10 | ~10h |
 | Day 3 | EP-6 Error Handling, EP-7 Security & Final QA | US-11, US-12, US-13 | ~7h |
-| **Total** | 7 Epics | **13 User Stories / 58 pts** | **~25h** |
+| **Total** | 7 Epics | **13 User Stories / 58 pts** | **~26h** |
 
-> **Key principle reflected in this estimate:** Unit tests are written on the **same day** as the feature — `NewsFeedBloc` tests on Day 1, `SearchBloc` and `BookmarkNotifier` tests on Day 2. CI/CD is active from **Day 1** so every PR is automatically tested and Copilot-reviewed throughout the entire project.
+> **Key principle reflected in this estimate:** Unit tests are written at the **end of each task** where the business logic is implemented — BLoC, UseCase, and Notifier tests are co-located with their implementation task. CI/CD is active from **Day 1** so every PR is automatically tested and Copilot-reviewed throughout the entire project.
