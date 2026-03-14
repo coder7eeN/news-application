@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/features/bookmark/presentation/pages/bookmark_page.dart';
 import 'package:news_app/features/news_feed/domain/entities/article.dart';
 import 'package:news_app/features/news_feed/presentation/pages/news_feed_page.dart';
 
@@ -33,11 +34,8 @@ class AppRouter {
           ),
         );
       case bookmarks:
-        // BookmarkPage will be added in US-10
         return MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Bookmarks — Coming Soon')),
-          ),
+          builder: (_) => const BookmarkPage(),
         );
       default:
         return MaterialPageRoute<void>(

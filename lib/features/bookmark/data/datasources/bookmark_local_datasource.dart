@@ -12,7 +12,7 @@ abstract class BookmarkLocalDataSource {
 
 /// Hive-backed implementation keyed by article ID (URL)
 class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
-  final Box<dynamic> box;
+  final Box<Object?> box;
 
   const BookmarkLocalDataSourceImpl({required this.box});
 

@@ -42,14 +42,25 @@ class BookmarkPage extends StatelessWidget {
             itemCount: bookmarks.length,
             itemBuilder: (context, index) {
               final article = bookmarks[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: ArticleCard(
-                  article: article,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => ArticleDetailPage(article: article),
+              return Dismissible(
+                key: ValueKey(article.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  color: Colors.red,
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) => notifier.toggleBookmark(article),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ArticleCard(
+                    article: article,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => ArticleDetailPage(article: article),
+                      ),
                     ),
                   ),
                 ),
