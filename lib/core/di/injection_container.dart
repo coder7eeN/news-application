@@ -15,6 +15,7 @@ import 'package:news_app/features/search/data/datasources/search_remote_datasour
 import 'package:news_app/features/search/data/repositories/search_repository_impl.dart';
 import 'package:news_app/features/search/domain/repositories/i_search_repository.dart';
 import 'package:news_app/features/search/domain/usecases/search_articles.dart';
+import 'package:news_app/features/article_detail/presentation/notifier/article_detail_notifier.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
 
 /// GetIt service locator instance
@@ -28,6 +29,7 @@ Future<void> init() async {
   // =========================================================================
   sl.registerFactory(() => NewsFeedBloc(getLatestArticles: sl()));
   sl.registerFactory(() => SearchBloc(searchArticles: sl()));
+  sl.registerFactory(() => ArticleDetailNotifier());
 
   // =========================================================================
   // Use Cases — lazy singleton
