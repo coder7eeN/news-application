@@ -11,3 +11,19 @@ class FetchLatestArticles extends NewsFeedEvent {
   @override
   List<Object> get props => [];
 }
+
+/// Dispatched to load the next page of articles
+class FetchNextPage extends NewsFeedEvent {
+  const FetchNextPage();
+
+  @override
+  List<Object> get props => [];
+}
+
+/// Dispatched on pull-to-refresh to reset and reload from page 1
+class RefreshFeed extends NewsFeedEvent {
+  const RefreshFeed();
+
+  @override
+  List<Object> get props => [];
+}

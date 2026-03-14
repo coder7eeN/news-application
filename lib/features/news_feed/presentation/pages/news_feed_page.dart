@@ -15,36 +15,98 @@ class NewsFeedPage extends StatelessWidget {
       create: (_) => sl<NewsFeedBloc>()..add(const FetchLatestArticles()),
       child: Scaffold(
         appBar: AppBar(title: const Text('News')),
-        body: BlocBuilder<NewsFeedBloc, NewsFeedState>(
-          builder: (context, state) {
-            if (state is NewsFeedLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is NewsFeedLoaded) {
-              return ListView.builder(
-                padding: const EdgeInsets.all(8),
-                itemCount: state.articles.length,
-                itemBuilder: (context, index) {
-                  final article = state.articles[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: ArticleCard(
-                      article: article,
-                      onTap: () {
-                        // Article detail navigation will be added in US-08
-                      },
-                    ),
-                  );
-                },
-              );
-            }
-            if (state is NewsFeedError) {
-              return Center(child: Text(state.message));
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+        body: const _NewsFeedView(),
       ),
+    );
+  }
+}
+
+class _NewsFeedView extends StatefulWidget {
+  const _NewsFeedView();
+
+  @override
+  State<_NewsFeedView> createState() => _NewsFeedViewState();
+}
+
+class _NewsFeedViewState extends State<_NewsFeedView> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isNearBottom) {
+      context.read<NewsFeedBloc>().add(const FetchNextPage());
+    }
+  }
+
+  bool get _isNearBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= maxScroll * 0.8;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<NewsFeedBloc, NewsFeedState>(
+      builder: (context, state) {
+        if (state is NewsFeedLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state is NewsFeedLoaded) {
+          final itemCount =
+              state.isLoadingMore
+                  ? state.articles.length + 1
+                  : state.articles.length;
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<NewsFeedBloc>().add(const RefreshFeed());
+              await context.read<NewsFeedBloc>().stream.firstWhere(
+                (s) => s is! NewsFeedLoading,
+              );
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(8),
+              itemCount: itemCount,
+              itemBuilder: (context, index) {
+                if (index >= state.articles.length) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                final article = state.articles[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ArticleCard(
+                    article: article,
+                    onTap: () {
+                      // Article detail navigation will be added in US-08
+                    },
+                  ),
+                );
+              },
+            ),
+          );
+        }
+        if (state is NewsFeedError) {
+          return Center(child: Text(state.message));
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

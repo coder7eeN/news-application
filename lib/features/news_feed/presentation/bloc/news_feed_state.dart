@@ -22,11 +22,28 @@ class NewsFeedLoading extends NewsFeedState {
 class NewsFeedLoaded extends NewsFeedState {
   final List<Article> articles;
   final bool hasReachedMax;
+  final bool isLoadingMore;
 
-  const NewsFeedLoaded({required this.articles, this.hasReachedMax = false});
+  const NewsFeedLoaded({
+    required this.articles,
+    this.hasReachedMax = false,
+    this.isLoadingMore = false,
+  });
+
+  NewsFeedLoaded copyWith({
+    List<Article>? articles,
+    bool? hasReachedMax,
+    bool? isLoadingMore,
+  }) {
+    return NewsFeedLoaded(
+      articles: articles ?? this.articles,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
 
   @override
-  List<Object> get props => [articles, hasReachedMax];
+  List<Object> get props => [articles, hasReachedMax, isLoadingMore];
 }
 
 class NewsFeedError extends NewsFeedState {
