@@ -12,14 +12,13 @@ class NewsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: sl<BookmarkNotifier>(),
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'News App',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
-        initialRoute: AppRouter.newsFeed,
-        onGenerateRoute: AppRouter.onGenerateRoute,
+        routerConfig: AppRouter.router,
       ),
     );
   }

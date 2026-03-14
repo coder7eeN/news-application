@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:news_app/core/di/injection_container.dart';
+import 'package:news_app/core/router/app_router.dart';
 import 'package:news_app/core/widgets/error_view.dart';
 import 'package:news_app/core/widgets/offline_banner.dart';
-import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
 import 'package:news_app/features/search/presentation/bloc/search_event.dart';
@@ -65,12 +66,9 @@ class _SearchView extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: ArticleCard(
                       article: article,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) =>
-                              ArticleDetailPage(article: article),
-                        ),
+                      onTap: () => context.push(
+                        AppRouter.articleDetail,
+                        extra: article,
                       ),
                     ),
                   );

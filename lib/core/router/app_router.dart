@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
+import 'package:news_app/features/bookmark/presentation/pages/bookmark_page.dart';
 import 'package:news_app/features/news_feed/domain/entities/article.dart';
 import 'package:news_app/features/news_feed/presentation/pages/news_feed_page.dart';
+import 'package:news_app/features/search/presentation/pages/search_page.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -10,41 +14,27 @@ class AppRouter {
   static const String search = '/search';
   static const String bookmarks = '/bookmarks';
 
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
-    switch (settings.name) {
-      case newsFeed:
-        return MaterialPageRoute<void>(
-          builder: (_) => const NewsFeedPage(),
-        );
-      case articleDetail:
-        final article = settings.arguments! as Article;
-        // ArticleDetailPage will be added in US-08
-        return MaterialPageRoute<void>(
-          builder: (_) => Scaffold(
-            appBar: AppBar(title: Text(article.title)),
-            body: const Center(child: Text('Article Detail — Coming Soon')),
-          ),
-        );
-      case search:
-        // SearchPage will be added in US-06
-        return MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Search — Coming Soon')),
-          ),
-        );
-      case bookmarks:
-        // BookmarkPage will be added in US-10
-        return MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Bookmarks — Coming Soon')),
-          ),
-        );
-      default:
-        return MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(
-            body: Center(child: Text('Page not found')),
-          ),
-        );
-    }
-  }
+  static final GoRouter router = GoRouter(
+    initialLocation: newsFeed,
+    routes: [
+      GoRoute(
+        path: newsFeed,
+        builder: (context, state) => const NewsFeedPage(),
+      ),
+      GoRoute(
+        path: articleDetail,
+        builder: (context, state) {
+          final article = state.extra! as Article;
+          return ArticleDetailPage(article: article);
+        },
+      ),
+      GoRoute(path: search, builder: (context, state) => const SearchPage()),
+      GoRoute(
+        path: bookmarks,
+        builder: (context, state) => const BookmarkPage(),
+      ),
+    ],
+    errorBuilder: (context, state) =>
+        const Scaffold(body: Center(child: Text('Page not found'))),
+  );
 }

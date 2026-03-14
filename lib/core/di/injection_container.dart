@@ -15,7 +15,6 @@ import 'package:news_app/features/search/data/datasources/search_remote_datasour
 import 'package:news_app/features/search/data/repositories/search_repository_impl.dart';
 import 'package:news_app/features/search/domain/repositories/i_search_repository.dart';
 import 'package:news_app/features/search/domain/usecases/search_articles.dart';
-import 'package:news_app/features/article_detail/presentation/notifier/article_detail_notifier.dart';
 import 'package:news_app/features/bookmark/data/datasources/bookmark_local_datasource.dart';
 import 'package:news_app/features/bookmark/presentation/notifier/bookmark_notifier.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
@@ -26,25 +25,18 @@ final sl = GetIt.instance;
 /// Initialize all dependencies
 /// Call this in main.dart before runApp()
 Future<void> init() async {
-  // =========================================================================
   // BLoCs — factory (new instance per widget tree injection)
-  // =========================================================================
   sl.registerFactory(() => NewsFeedBloc(getLatestArticles: sl()));
   sl.registerFactory(() => SearchBloc(searchArticles: sl()));
-  sl.registerFactory(() => ArticleDetailNotifier());
   sl.registerLazySingleton(
     () => BookmarkNotifier(localDataSource: sl()),
   );
 
-  // =========================================================================
   // Use Cases — lazy singleton
-  // =========================================================================
   sl.registerLazySingleton(() => GetLatestArticlesUseCase(sl()));
   sl.registerLazySingleton(() => SearchArticlesUseCase(sl()));
 
-  // =========================================================================
   // Repositories — lazy singleton, registered as interface
-  // =========================================================================
   sl.registerLazySingleton<INewsFeedRepository>(
     () => NewsFeedRepositoryImpl(
       remoteDataSource: sl(),
@@ -59,9 +51,7 @@ Future<void> init() async {
     ),
   );
 
-  // =========================================================================
   // Data Sources — lazy singleton
-  // =========================================================================
   sl.registerLazySingleton<NewsFeedRemoteDataSource>(
     () => NewsFeedRemoteDataSourceImpl(dio: sl()),
   );
@@ -79,9 +69,7 @@ Future<void> init() async {
     ),
   );
 
-  // =========================================================================
   // Core
-  // =========================================================================
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(connectivity: sl()),
   );
