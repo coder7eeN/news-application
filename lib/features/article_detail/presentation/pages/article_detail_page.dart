@@ -67,11 +67,11 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
           // Loading progress bar (ValueListenableBuilder — no setState needed)
           ValueListenableBuilder<bool>(
             valueListenable: _notifier.isLoading,
-            builder: (_, loading, __) {
+            builder: (_, loading, _) {
               if (!loading) return const SizedBox.shrink();
               return ValueListenableBuilder<int>(
                 valueListenable: _notifier.progress,
-                builder: (_, prog, __) => LinearProgressIndicator(
+                builder: (_, prog, _) => LinearProgressIndicator(
                   value: prog / 100,
                   backgroundColor: Colors.transparent,
                 ),
