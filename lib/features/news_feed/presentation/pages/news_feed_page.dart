@@ -5,6 +5,7 @@ import 'package:news_app/features/news_feed/presentation/bloc/news_feed_bloc.dar
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_event.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_state.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
+import 'package:news_app/features/search/presentation/pages/search_page.dart';
 
 class NewsFeedPage extends StatelessWidget {
   const NewsFeedPage({super.key});
@@ -14,7 +15,20 @@ class NewsFeedPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<NewsFeedBloc>()..add(const FetchLatestArticles()),
       child: Scaffold(
-        appBar: AppBar(title: const Text('News')),
+        appBar: AppBar(
+          title: const Text('News'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const SearchPage(),
+                ),
+              ),
+            ),
+          ],
+        ),
         body: const _NewsFeedView(),
       ),
     );
