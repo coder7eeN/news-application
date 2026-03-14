@@ -16,6 +16,8 @@ import 'package:news_app/features/search/data/repositories/search_repository_imp
 import 'package:news_app/features/search/domain/repositories/i_search_repository.dart';
 import 'package:news_app/features/search/domain/usecases/search_articles.dart';
 import 'package:news_app/features/article_detail/presentation/notifier/article_detail_notifier.dart';
+import 'package:news_app/features/bookmark/data/datasources/bookmark_local_datasource.dart';
+import 'package:news_app/features/bookmark/presentation/notifier/bookmark_notifier.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
 
 /// GetIt service locator instance
@@ -30,6 +32,9 @@ Future<void> init() async {
   sl.registerFactory(() => NewsFeedBloc(getLatestArticles: sl()));
   sl.registerFactory(() => SearchBloc(searchArticles: sl()));
   sl.registerFactory(() => ArticleDetailNotifier());
+  sl.registerLazySingleton(
+    () => BookmarkNotifier(localDataSource: sl()),
+  );
 
   // =========================================================================
   // Use Cases — lazy singleton
@@ -62,11 +67,16 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<NewsFeedLocalDataSource>(
     () => NewsFeedLocalDataSourceImpl(
-      box: Hive.box(CacheConstants.feedBoxName),
+      box: Hive.box<Object?>(CacheConstants.feedBoxName),
     ),
   );
   sl.registerLazySingleton<SearchRemoteDataSource>(
     () => SearchRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<BookmarkLocalDataSource>(
+    () => BookmarkLocalDataSourceImpl(
+      box: Hive.box<Object?>(CacheConstants.bookmarksBoxName),
+    ),
   );
 
   // =========================================================================

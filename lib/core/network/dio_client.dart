@@ -18,14 +18,14 @@ class DioClient {
 
     // Add interceptors in order
     dio.interceptors.addAll([
-      AuthInterceptor(),
-      ErrorInterceptor(),
       if (kDebugMode)
         PrettyDioLogger(
           requestHeader: false,
           requestBody: false,
           responseBody: true,
         ),
+      AuthInterceptor(),
+      ErrorInterceptor(),
     ]);
 
     return dio;

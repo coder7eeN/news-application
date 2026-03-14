@@ -20,14 +20,14 @@ class NewsFeedRemoteDataSourceImpl implements NewsFeedRemoteDataSource {
   @override
   Future<List<ArticleModel>> fetchArticles(int page) async {
     try {
-      // Calculate date 30 days ago for recent articles
-      final fromDate = DateTime.now().subtract(const Duration(days: 30));
-      final fromDateStr = fromDate.toIso8601String().split('T').first;
+      final now = DateTime.now();
+      final lastMonth = DateTime(now.year, now.month - 1, now.day);
+      final fromDateStr = lastMonth.toIso8601String().split('T').first;
 
       final response = await dio.get<Map<String, dynamic>>(
         '/everything',
         queryParameters: {
-          'q': 'news',
+          'q': 'tesla',
           'from': fromDateStr,
           'sortBy': 'publishedAt',
           'language': 'en',
@@ -35,7 +35,6 @@ class NewsFeedRemoteDataSourceImpl implements NewsFeedRemoteDataSource {
           'page': page,
         },
       );
-
       final articles = response.data?['articles'] as List<dynamic>?;
       if (articles == null) {
         throw const ServerException('Invalid response format');
