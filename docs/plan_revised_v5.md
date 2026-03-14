@@ -244,15 +244,17 @@ Focus on **BLoC + UseCase** unit tests only. Skip widget/integration tests unles
 
 ### Priority Test Cases
 
-| # | Test Target | Scenario |
-|---|---|---|
-| 1 | `NewsFeedBloc` | Emits loading → loaded states on fetch success |
-| 2 | `NewsFeedBloc` | Emits error state when API fails |
-| 3 | `NewsFeedBloc` | Pagination: appends new articles to existing list |
-| 4 | `SearchBloc` | Emits results after debounce delay |
-| 5 | `SearchBloc` | Cancels previous request when new query arrives |
-| 6 | `GetLatestArticlesUseCase` | Returns cached data when offline |
-| 7 | `BookmarkNotifier` | Toggle bookmark adds/removes article correctly |
+| # | Test Target | Scenario | Written With |
+|---|---|---|---|
+| 1 | `GetLatestArticlesUseCase` | Returns correct data from repository, propagates failure on error | US-03 |
+| 2 | `NewsFeedBloc` | Emits loading → loaded states on fetch success | US-04 |
+| 3 | `NewsFeedBloc` | Emits error state when API fails | US-04 |
+| 4 | `NewsFeedBloc` | Pagination: appends new articles to existing list | US-04 |
+| 5 | `SearchArticlesUseCase` | Returns search results from repository, handles empty query | US-06 |
+| 6 | `SearchBloc` | Emits results after debounce delay | US-07 |
+| 7 | `SearchBloc` | Cancels previous request when new query arrives | US-07 |
+| 8 | `ArticleDetailNotifier` | Emits loading → loaded on valid article, error on failure | US-08 |
+| 9 | `BookmarkNotifier` | Toggle bookmark adds/removes article correctly, persists to Hive | US-09 |
 
 ### Test Structure
 ```dart
@@ -383,9 +385,9 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 ## 11. 3-Day Development Timeline
 
-> **Principle:** CI/CD is set up on Day 1 — before any feature code is written. This ensures every commit from Day 1 onward is automatically tested and reviewed by Copilot, which is the entire point of having a pipeline. Unit tests are written **in the same day** as the feature they cover.
+> **Principle:** CI/CD is set up on Day 1 — before any feature code is written. This ensures every commit from Day 1 onward is automatically tested and reviewed by Copilot, which is the entire point of having a pipeline. Unit tests are written at the **end of each task** where the business logic (BLoC, UseCase, Notifier) is implemented.
 
-### Day 1 — Foundation + CI/CD + News Feed
+### Day 1 — Foundation + CI/CD + News Feed (~9h)
 - [ ] Project setup: folder structure, dependencies, GetIt DI
 - [ ] **GitHub Actions: `ci.yml` + `build.yml`** ← set up before writing features
 - [ ] **Enable Copilot Auto Review in repo settings** ← active from first PR
@@ -394,27 +396,31 @@ Go to **Settings → Secrets and variables → Actions** and add:
 - [ ] `Article` entity + `ArticleModel` (JSON parsing)
 - [ ] `INewsFeedRepository` + `NewsFeedRepositoryImpl`
 - [ ] `GetLatestArticlesUseCase`
-- [ ] `NewsFeedBloc` (fetch + pagination)
-- [ ] **Unit tests: `NewsFeedBloc`** (loading → loaded, error state, pagination) ← same day as BLoC
-- [ ] **Unit tests: `GetLatestArticlesUseCase`** (offline cache scenario) ← same day as UseCase
+- [ ] **Unit tests: `GetLatestArticlesUseCase`** ← end of UseCase task (US-03)
+- [ ] `NewsFeedBloc` (fetch + pagination + concurrency transformers)
+- [ ] **Unit tests: `NewsFeedBloc`** (loading → loaded, error state, pagination) ← end of BLoC task (US-04)
 - [ ] `NewsFeedPage` UI with infinite scroll + pull-to-refresh
-- [ ] Error / empty / loading states for Feed
+- [ ] `LocalDataSource` + TTL logic + cache-first repository flow
+- [ ] Pull-to-refresh with cache invalidation
 
-### Day 2 — Search + Article Detail + Bookmarks + Unit Tests
+### Day 2 — Search + Article Detail + Bookmarks (~10h)
+- [ ] `SearchRemoteDataSource` + `SearchRepositoryImpl`
+- [ ] `SearchArticlesUseCase`
+- [ ] **Unit tests: `SearchArticlesUseCase`** ← end of UseCase task (US-06)
 - [ ] `SearchBloc` with debounce `EventTransformer` + `CancelToken`
-- [ ] **Unit tests: `SearchBloc`** (debounce, cancel previous request) ← same day as BLoC
+- [ ] **Unit tests: `SearchBloc`** (debounce, cancel previous request) ← end of BLoC task (US-07)
 - [ ] Search UI + states
-- [ ] `ArticleDetailPage` with `ValueNotifier`
-- [ ] WebView integration for full article
+- [ ] `ArticleDetailNotifier` (ValueNotifier)
+- [ ] **Unit tests: `ArticleDetailNotifier`** ← end of Notifier task (US-08)
+- [ ] `ArticleDetailPage` + WebView integration
 - [ ] `BookmarkNotifier` with Hive persistence
-- [ ] **Unit tests: `BookmarkNotifier`** (add/remove toggle) ← same day as Notifier
+- [ ] **Unit tests: `BookmarkNotifier`** (add/remove toggle, Hive persistence) ← end of Notifier task (US-09)
 - [ ] Bookmark UI (add/remove, offline list)
 
-### Day 3 — Polish + Security + Final QA
+### Day 3 — Polish + Security + Final QA (~7h)
 - [ ] Connectivity check + offline banner
 - [ ] Error handling review across all features
 - [ ] `--dart-define` for API key + obfuscation flags in build command
-- [ ] Additional unit tests for edge cases
 - [ ] Final test run + bug fixes
 - [ ] README with setup instructions (include `--dart-define` usage)
 
@@ -529,4 +535,4 @@ This keeps BLoC clean — it only reacts to `Failure` types, never infrastructur
 
 ---
 
-*Plan version: 5.0 — Unit tests now co-located with feature in same day; NewsFeedBloc tests moved to Day 1.
+*Plan version: 5.1 — Unit tests now written at the end of each task where the business logic is implemented (BLoC, UseCase, Notifier). Added SearchArticlesUseCase and ArticleDetailNotifier tests.

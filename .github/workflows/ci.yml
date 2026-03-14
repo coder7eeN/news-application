@@ -14,25 +14,50 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for business logic changes
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.dart')
+          echo "Changed Dart files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '(bloc/|usecases/|notifier/|_bloc\.dart|_usecase\.dart|_notifier\.dart|test/features/)'; then
+            echo "has_business_logic=true" >> "$GITHUB_OUTPUT"
+            echo "Business logic changes detected — tests will run."
+          else
+            echo "has_business_logic=false" >> "$GITHUB_OUTPUT"
+            echo "No business logic changes — skipping tests."
+          fi
 
       - name: Set up Flutter
+        if: steps.changes.outputs.has_business_logic == 'true'
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
 
       - name: Install dependencies
+        if: steps.changes.outputs.has_business_logic == 'true'
         run: flutter pub get
 
-#      - name: Run tests with coverage
-#        run: flutter test --coverage
-#
-#      - name: Upload coverage report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: coverage-report
-#          path: coverage/lcov.info
-#          retention-days: 7
+      - name: Run build runner
+        if: steps.changes.outputs.has_business_logic == 'true'
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Run tests with coverage
+        if: steps.changes.outputs.has_business_logic == 'true'
+        run: flutter test test/features/ --coverage
+
+      - name: Upload coverage report
+        if: steps.changes.outputs.has_business_logic == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/lcov.info
+          retention-days: 7
 
   analyze:
     name: Analyze Code
@@ -50,6 +75,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Run build runner
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Run static analysis
         run: flutter analyze --fatal-infos
