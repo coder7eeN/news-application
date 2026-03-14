@@ -49,7 +49,9 @@ class _SearchViewState extends State<_SearchView> {
   }
 
   void _onScroll() {
-    if (_isNearBottom) {
+    if (!_isNearBottom) return;
+    final state = context.read<SearchBloc>().state;
+    if (state is SearchLoaded && !state.isLoadingMore && !state.hasReachedMax) {
       context.read<SearchBloc>().add(const SearchLoadMore());
     }
   }
@@ -67,6 +69,7 @@ class _SearchViewState extends State<_SearchView> {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
+          controller: _searchController,
           autofocus: true,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
@@ -78,6 +81,7 @@ class _SearchViewState extends State<_SearchView> {
               icon: const Icon(Icons.clear, color: Colors.white),
               onPressed: () {
                 context.read<SearchBloc>().add(const SearchQueryChanged(''));
+                _searchController.clear();
               },
             ),
           ),
