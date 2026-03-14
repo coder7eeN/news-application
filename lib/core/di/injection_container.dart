@@ -1,8 +1,11 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:news_app/core/cache/cache_constants.dart';
 import 'package:news_app/core/network/dio_client.dart';
 import 'package:news_app/core/network/network_info.dart';
+import 'package:news_app/features/news_feed/data/datasources/news_feed_local_datasource.dart';
 import 'package:news_app/features/news_feed/data/datasources/news_feed_remote_datasource.dart';
 import 'package:news_app/features/news_feed/data/repositories/news_feed_repository_impl.dart';
 import 'package:news_app/features/news_feed/domain/repositories/i_news_feed_repository.dart';
@@ -31,6 +34,7 @@ Future<void> init() async {
   sl.registerLazySingleton<INewsFeedRepository>(
     () => NewsFeedRepositoryImpl(
       remoteDataSource: sl(),
+      localDataSource: sl(),
       networkInfo: sl(),
     ),
   );
@@ -40,6 +44,11 @@ Future<void> init() async {
   // =========================================================================
   sl.registerLazySingleton<NewsFeedRemoteDataSource>(
     () => NewsFeedRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<NewsFeedLocalDataSource>(
+    () => NewsFeedLocalDataSourceImpl(
+      box: Hive.box(CacheConstants.feedBoxName),
+    ),
   );
 
   // =========================================================================
