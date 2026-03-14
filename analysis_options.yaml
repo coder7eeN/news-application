@@ -47,7 +47,6 @@ linter:
     avoid_catches_without_on_clauses: true
     avoid_empty_else: true
     avoid_null_checks_in_equality_operators: true
-    avoid_returning_null_for_future: true
     avoid_slow_async_io: true
     avoid_type_to_string: true
     avoid_web_libraries_in_flutter: true
@@ -77,7 +76,6 @@ linter:
 
     # Documentation
     public_member_api_docs: false  # Set to true for libraries
-    package_api_docs: false
 
     # Flutter specific
     avoid_unnecessary_containers: true
