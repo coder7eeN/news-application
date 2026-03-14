@@ -12,8 +12,8 @@ class HiveHelper {
     await Hive.initFlutter();
 
     // Open required boxes
-    await Hive.openBox<dynamic>(CacheConstants.feedBoxName);
-    await Hive.openBox<dynamic>(CacheConstants.bookmarksBoxName);
+    await Hive.openBox<Object?>(CacheConstants.feedBoxName);
+    await Hive.openBox<Object?>(CacheConstants.bookmarksBoxName);
   }
 
   /// Get an already-opened Hive box by name
