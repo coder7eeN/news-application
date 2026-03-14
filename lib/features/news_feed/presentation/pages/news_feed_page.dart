@@ -55,7 +55,8 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
     if (!_scrollController.hasClients) return false;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
-    return currentScroll >= maxScroll * 0.8;
+    const scrollThreshold = 0.8;
+    return currentScroll >= maxScroll * scrollThreshold;
   }
 
   @override
@@ -72,9 +73,14 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
                   : state.articles.length;
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<NewsFeedBloc>().add(const RefreshFeed());
-              await context.read<NewsFeedBloc>().stream.firstWhere(
-                (s) => s is! NewsFeedLoading,
+              final bloc = context.read<NewsFeedBloc>();
+              final future = bloc.stream.firstWhere(
+                (s) => s is NewsFeedLoaded || s is NewsFeedError,
+              );
+              bloc.add(const RefreshFeed());
+              await future.timeout(
+                const Duration(seconds: 10),
+                onTimeout: () => state,
               );
             },
             child: ListView.builder(

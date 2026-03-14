@@ -20,18 +20,7 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
     FetchLatestArticles event,
     Emitter<NewsFeedState> emit,
   ) async {
-    emit(const NewsFeedLoading());
-    final result = await getLatestArticles(1);
-    result.fold(
-      (failure) => emit(NewsFeedError(failure.message)),
-      (articles) {
-        _currentPage = 2;
-        emit(NewsFeedLoaded(
-          articles: articles,
-          hasReachedMax: articles.length < CacheConstants.pageSize,
-        ));
-      },
-    );
+    await _fetchFirstPage(emit);
   }
 
   Future<void> _onFetchNextPage(
@@ -60,6 +49,10 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
     Emitter<NewsFeedState> emit,
   ) async {
     _currentPage = 1;
+    await _fetchFirstPage(emit);
+  }
+
+  Future<void> _fetchFirstPage(Emitter<NewsFeedState> emit) async {
     emit(const NewsFeedLoading());
     final result = await getLatestArticles(1);
     result.fold(
