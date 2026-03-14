@@ -5,6 +5,7 @@ import 'package:news_app/features/news_feed/presentation/bloc/news_feed_bloc.dar
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_event.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_state.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
+import 'package:news_app/features/article_detail/presentation/pages/article_detail_page.dart';
 import 'package:news_app/features/search/presentation/pages/search_page.dart';
 
 class NewsFeedPage extends StatelessWidget {
@@ -113,9 +114,13 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: ArticleCard(
                     article: article,
-                    onTap: () {
-                      // Article detail navigation will be added in US-08
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) =>
+                            ArticleDetailPage(article: article),
+                      ),
+                    ),
                   ),
                 );
               },
