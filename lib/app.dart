@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/core/router/app_router.dart';
 import 'package:news_app/core/theme/app_theme.dart';
-import 'package:news_app/features/news_feed/presentation/pages/news_feed_page.dart';
 
 class NewsApp extends StatelessWidget {
   const NewsApp({super.key});
@@ -13,7 +13,8 @@ class NewsApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: const NewsFeedPage(),
+      initialRoute: AppRouter.newsFeed,
+      onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
 }
