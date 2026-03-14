@@ -669,13 +669,140 @@ GitHub Secret required: `NEWS_API_KEY` → Settings → Secrets and variables �
 
 ## Code Style
 
-- Naming: `camelCase` variables/functions · `PascalCase` classes · `snake_case` files
-- Import order: `dart:` → `package:flutter/` → third-party → project (`// ignore_for_file` if needed)
-- No `dynamic` types — use proper typed models everywhere
-- Prefer `const` constructors wherever possible
-- No silent catches — always log or map to `Failure` and propagate
+The project enforces strict linting rules via `analysis_options.yaml`. Always run `flutter analyze --fatal-infos` before commits.
+
+### Naming Conventions
+- `camelCase` for variables and functions
+- `PascalCase` for classes, enums, and typedefs
+- `snake_case` for file names
 - Private fields and methods prefixed with `_`
-- Max ~200 lines per file — split into smaller widgets or classes if exceeded
+
+### Import Rules
+- **Order**: `dart:` → `package:flutter/` → third-party → project
+- **Always use package imports** for project files (not relative imports)
+- Use single quotes for all strings (enforced by `prefer_single_quotes`)
+
+**Example:**
+```dart
+// ✅ Correct
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:news_app/core/error/failures.dart';
+
+// ❌ Wrong
+import '../core/error/failures.dart';  // Never use relative imports
+import "package:dio/dio.dart";  // Never use double quotes
+```
+
+### Type Safety (Strict Mode Enabled)
+- **No `dynamic` types** — always declare explicit types
+- **Always declare return types** on functions and methods
+- **Strict inference** and **strict casts** enabled in analyzer
+- Use `var` only when type is obvious from right-hand side
+
+**Example:**
+```dart
+// ✅ Correct
+Future<Either<Failure, List<Article>>> getArticles() async { ... }
+final List<String> names = ['Alice', 'Bob'];
+final count = 5;  // OK - type is obvious
+
+// ❌ Wrong
+getArticles() async { ... }  // Missing return type
+var names = getData();  // Type not obvious
+List names = ['Alice'];  // Missing type argument
+```
+
+### Const and Final
+- **Prefer const** constructors wherever possible
+- **Prefer const** for collections and literals
+- **Prefer final** for local variables that won't change
+- **Prefer final** for fields that won't be reassigned
+
+**Example:**
+```dart
+// ✅ Correct
+const String apiKey = 'key';
+final List<Article> articles = [];
+const EdgeInsets.all(16.0);
+const ['apple', 'banana'];
+
+// ❌ Wrong
+String apiKey = 'key';  // Should be const
+var articles = <Article>[];  // Should be final List<Article>
+EdgeInsets.all(16.0);  // Should be const
+```
+
+### Error Handling
+- **No silent catches** — always use `on` clause to catch specific exceptions
+- Always log errors or map to `Failure` and propagate
+- Never catch without handling — avoid empty catch blocks
+
+**Example:**
+```dart
+// ✅ Correct
+try {
+  await api.fetch();
+} on DioException catch (e) {
+  return Left(ServerFailure(e.message));
+} on SocketException catch (e) {
+  return Left(const NoInternetFailure());
+}
+
+// ❌ Wrong
+try {
+  await api.fetch();
+} catch (e) {  // Missing 'on' clause
+  // empty - silent failure
+}
+```
+
+### Performance Best Practices
+- **Avoid function literals in forEach** — use `for-in` loops instead
+- **Prefer collection literals** over constructors (`[]` not `List()`)
+- **Prefer spread collections** over `.addAll()`
+- **Use `const` constructors in immutables**
+
+**Example:**
+```dart
+// ✅ Correct
+for (final item in items) {
+  print(item);
+}
+final list = [...oldList, newItem];
+const SizedBox(height: 16);
+
+// ❌ Wrong
+items.forEach((item) => print(item));
+final list = List.from(oldList)..add(newItem);
+SizedBox(height: 16);  // Should be const
+```
+
+### Flutter-Specific Rules
+- **Avoid unnecessary containers** — use SizedBox, Padding, or Center directly
+- **Use SizedBox for whitespace** instead of Container with fixed size
+- **Use DecoratedBox** instead of Container when only decoration is needed
+- **Use ColoredBox** instead of Container when only color is needed
+- **Use super parameters** in constructors (e.g., `super.key` not `key: key`)
+
+**Example:**
+```dart
+// ✅ Correct
+const SizedBox(height: 16);
+const ColoredBox(color: Colors.red, child: Text('Hi'));
+const MyWidget({super.key, required this.title});
+
+// ❌ Wrong
+Container(height: 16);  // Use SizedBox
+Container(color: Colors.red, child: Text('Hi'));  // Use ColoredBox
+const MyWidget({Key? key, required this.title}) : super(key: key);  // Use super.key
+```
+
+### File Size and Structure
+- Max ~200 lines per file — split into smaller files if exceeded
+- Extract widgets into separate files when they become complex
+- Keep presentation/bloc/pages/widgets organized by feature
 
 ---
 
@@ -713,6 +840,7 @@ GitHub Secret required: `NEWS_API_KEY` → Settings → Secrets and variables �
 
 ## What Claude Should NOT Do
 
+### Architecture Violations
 - **Do not use `flutter_dotenv`** — `.env` files are extractable from APK
 - **Do not use `hive` or `hive_flutter`** — use `hive_ce` and `hive_ce_flutter` (original packages are unmaintained)
 - **Do not put `hive_ce_generator` or `build_runner` in `dependencies`** — they belong in `dev_dependencies` only
@@ -725,6 +853,23 @@ GitHub Secret required: `NEWS_API_KEY` → Settings → Secrets and variables �
 - **Do not expose raw exceptions or API keys in UI messages** — always map to generic Failure
 - **Do not create a BLoC for Article Detail or Bookmarks** — use ValueNotifier / ChangeNotifier
 - **Do not hardcode box names, TTL values, or cache keys inline** — use `CacheConstants`
+
+### Code Style Violations (Will Fail Linting)
+- **Do not use relative imports** — always use package imports (`package:news_app/...`)
+- **Do not use double quotes** for strings — always use single quotes
+- **Do not omit return types** — every function/method must declare its return type
+- **Do not use `dynamic`** — always use explicit types
+- **Do not use `var` when type is not obvious** — declare explicit types
+- **Do not skip `const`** — use `const` for constructors, literals, and collections when possible
+- **Do not skip `final`** — use `final` for local variables and fields that won't be reassigned
+- **Do not catch without `on` clause** — always specify exception type
+- **Do not use `Container()` for whitespace** — use `SizedBox`
+- **Do not use `Container()` for color only** — use `ColoredBox`
+- **Do not use `Container()` for decoration only** — use `DecoratedBox`
+- **Do not use old constructor syntax** — use super parameters (`super.key` not `key: key`)
+- **Do not use `forEach` with function literals** — use `for-in` loops instead
+- **Do not use `List()` constructor** — use `[]` literal
+- **Do not use `.addAll()`** — use spread operator `[...list, item]`
 
 ---
 
