@@ -13,6 +13,7 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 ## Table of Contents
 
 - [Demo](#demo)
+- [API Documentation](#api-documentation)
 - [Setup Instructions](#setup-instructions)
 - [Architecture & State Management](#architecture--state-management)
 - [Planning Process & Task Breakdown](#planning-process--task-breakdown)
@@ -26,25 +27,18 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 
 ## Demo
 
-### Download APK
-
-The latest release APK is built automatically by CI on every merge to `main`:
-
-**[Download APK](build/app/outputs/flutter-apk/app-release.apk)**
-
-> To install on Android: enable **Settings → Install unknown apps** for your file manager/browser, then open the APK.
-
-### API Documentation
-
-This project uses [NewsAPI](https://newsapi.org/) as the data source. Full API reference: [NewsAPI Docs](https://newsapi.org/docs)
-
-For detailed project documentation, see the [`docs/`](docs/) folder.
-
 ### Screen Recording
 
-https://github.com/user-attachments/assets/demo.mp4
-
 <video src="screenshots/demo.mp4" controls width="300"></video>
+
+---
+
+## API Documentation
+
+This project uses [NewsAPI](https://newsapi.org/) as the data source.
+
+- Official API reference: [NewsAPI Docs](https://newsapi.org/docs)
+- Local endpoint documentation: [`docs/newsapi-everything-docs.md`](docs/newsapi-everything-docs.md)
 
 ---
 
@@ -352,4 +346,5 @@ See [AI Transparency Log](docs/ai_transparency_log.md) for full disclosure inclu
 | [`docs/architecture_reference.md`](docs/architecture_reference.md) | Code templates for Clean Architecture layers |
 | [`docs/caching_and_networking.md`](docs/caching_and_networking.md) | Cache-first strategy, Dio setup, security rules |
 | [`docs/code_style_reference.md`](docs/code_style_reference.md) | Lint rules, naming conventions, import order |
+| [`docs/newsapi-everything-docs.md`](docs/newsapi-everything-docs.md) | NewsAPI `/v2/everything` endpoint documentation |
 | [`docs/ai_transparency_log.md`](docs/ai_transparency_log.md) | Full AI usage disclosure and reflection |
