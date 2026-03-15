@@ -12,6 +12,7 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 
 ## Table of Contents
 
+- [Demo](#demo)
 - [Setup Instructions](#setup-instructions)
 - [Architecture & State Management](#architecture--state-management)
 - [Planning Process & Task Breakdown](#planning-process--task-breakdown)
@@ -20,6 +21,30 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 - [Testing](#testing)
 - [AI Transparency](#ai-transparency)
 - [Documentation Index](#documentation-index)
+
+---
+
+## Demo
+
+### Download APK
+
+The latest release APK is built automatically by CI on every merge to `main`:
+
+**[Download APK](build/app/outputs/flutter-apk/app-release.apk)**
+
+> To install on Android: enable **Settings → Install unknown apps** for your file manager/browser, then open the APK.
+
+### API Documentation
+
+This project uses [NewsAPI](https://newsapi.org/) as the data source. Full API reference: [NewsAPI Docs](https://newsapi.org/docs)
+
+For detailed project documentation, see the [`docs/`](docs/) folder.
+
+### Screen Recording
+
+https://github.com/user-attachments/assets/demo.mp4
+
+<video src="screenshots/demo.mp4" controls width="300"></video>
 
 ---
 
