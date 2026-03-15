@@ -5,6 +5,7 @@ import 'package:news_app/core/di/injection_container.dart';
 import 'package:news_app/core/router/app_router.dart';
 import 'package:news_app/core/widgets/error_view.dart';
 import 'package:news_app/core/widgets/offline_banner.dart';
+import 'package:news_app/core/widgets/shimmer_list.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
 import 'package:news_app/features/search/presentation/bloc/search_bloc.dart';
 import 'package:news_app/features/search/presentation/bloc/search_event.dart';
@@ -114,7 +115,7 @@ class _SearchViewState extends State<_SearchView> {
               return const Center(child: Text('Search for news articles'));
             }
             if (state is SearchLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const ShimmerList();
             }
             if (state is SearchLoaded) {
               final itemCount = state.isLoadingMore

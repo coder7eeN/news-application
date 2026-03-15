@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/core/ultis/date_formatter.dart';
 import 'package:news_app/features/news_feed/domain/entities/article.dart';
 
 class ArticleCard extends StatelessWidget {
@@ -41,6 +42,16 @@ class ArticleCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 4),
+                  if (article.description != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      article.description!,
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,7 +64,7 @@ class ArticleCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        _formatRelativeTime(article.publishedAt),
+                        formatRelativeTime(article.publishedAt),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -80,32 +91,4 @@ class _ImagePlaceholder extends StatelessWidget {
       child: const Icon(Icons.image, size: 48, color: Colors.grey),
     );
   }
-}
-
-String _formatRelativeTime(DateTime dateTime) {
-  final difference = DateTime.now().difference(dateTime);
-  if (difference.inMinutes < 60) {
-    return '${difference.inMinutes}m ago';
-  }
-  if (difference.inHours < 24) {
-    return '${difference.inHours}h ago';
-  }
-  if (difference.inDays < 7) {
-    return '${difference.inDays}d ago';
-  }
-  final months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return '${months[dateTime.month - 1]} ${dateTime.day}';
 }

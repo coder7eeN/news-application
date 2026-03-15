@@ -34,11 +34,11 @@ void main() {
     ),
   );
 
-  final tFewArticles = [
+  final tPage2Articles = [
     Article(
-      id: 'https://example.com/1',
-      title: 'Article 1',
-      url: 'https://example.com/1',
+      id: 'https://example.com/20',
+      title: 'Page 2 Article',
+      url: 'https://example.com/20',
       publishedAt: DateTime(2026, 3, 14),
       sourceName: 'Source',
     ),
@@ -49,13 +49,13 @@ void main() {
       'emits [Loading, Loaded] when fetch succeeds',
       build: () {
         when(() => mockUseCase(1))
-            .thenAnswer((_) async => Right(tArticles));
+            .thenAnswer((_) async => Right((tArticles, 100)));
         return bloc;
       },
       act: (b) => b.add(const FetchLatestArticles()),
       expect: () => [
         const NewsFeedLoading(),
-        NewsFeedLoaded(articles: tArticles),
+        NewsFeedLoaded(articles: tArticles, totalResults: 100),
       ],
     );
 
@@ -74,16 +74,20 @@ void main() {
     );
 
     blocTest<NewsFeedBloc, NewsFeedState>(
-      'sets hasReachedMax true when fewer than 20 articles returned',
+      'sets hasReachedMax when articles.length >= totalResults',
       build: () {
         when(() => mockUseCase(1))
-            .thenAnswer((_) async => Right(tFewArticles));
+            .thenAnswer((_) async => Right((tArticles, 20)));
         return bloc;
       },
       act: (b) => b.add(const FetchLatestArticles()),
       expect: () => [
         const NewsFeedLoading(),
-        NewsFeedLoaded(articles: tFewArticles, hasReachedMax: true),
+        NewsFeedLoaded(
+          articles: tArticles,
+          totalResults: 20,
+          hasReachedMax: true,
+        ),
       ],
     );
   });
@@ -93,16 +97,20 @@ void main() {
       'appends articles when page 2 succeeds',
       build: () {
         when(() => mockUseCase(any()))
-            .thenAnswer((_) async => Right(tFewArticles));
+            .thenAnswer((_) async => Right((tPage2Articles, 100)));
         return bloc;
       },
-      seed: () => NewsFeedLoaded(articles: tArticles),
+      seed: () => NewsFeedLoaded(articles: tArticles, totalResults: 100),
       act: (b) => b.add(const FetchNextPage()),
       expect: () => [
-        NewsFeedLoaded(articles: tArticles, isLoadingMore: true),
         NewsFeedLoaded(
-          articles: [...tArticles, ...tFewArticles],
-          hasReachedMax: true,
+          articles: tArticles,
+          totalResults: 100,
+          isLoadingMore: true,
+        ),
+        NewsFeedLoaded(
+          articles: [...tArticles, ...tPage2Articles],
+          totalResults: 100,
         ),
       ],
     );
@@ -110,8 +118,11 @@ void main() {
     blocTest<NewsFeedBloc, NewsFeedState>(
       'does nothing when hasReachedMax is true',
       build: () => bloc,
-      seed: () =>
-          NewsFeedLoaded(articles: tArticles, hasReachedMax: true),
+      seed: () => NewsFeedLoaded(
+        articles: tArticles,
+        totalResults: 20,
+        hasReachedMax: true,
+      ),
       act: (b) => b.add(const FetchNextPage()),
       expect: () => <NewsFeedState>[],
     );
@@ -130,12 +141,17 @@ void main() {
             .thenAnswer((_) async => const Left(ServerFailure()));
         return bloc;
       },
-      seed: () => NewsFeedLoaded(articles: tArticles),
+      seed: () => NewsFeedLoaded(articles: tArticles, totalResults: 100),
       act: (b) => b.add(const FetchNextPage()),
       expect: () => [
-        NewsFeedLoaded(articles: tArticles, isLoadingMore: true),
         NewsFeedLoaded(
           articles: tArticles,
+          totalResults: 100,
+          isLoadingMore: true,
+        ),
+        NewsFeedLoaded(
+          articles: tArticles,
+          totalResults: 100,
           paginationError: 'Server error. Please try again.',
         ),
       ],
@@ -147,14 +163,14 @@ void main() {
       'emits [Loading, Loaded] with fresh articles',
       build: () {
         when(() => mockUseCase(1))
-            .thenAnswer((_) async => Right(tArticles));
+            .thenAnswer((_) async => Right((tArticles, 100)));
         return bloc;
       },
-      seed: () => NewsFeedLoaded(articles: tFewArticles),
+      seed: () => NewsFeedLoaded(articles: tPage2Articles, totalResults: 100),
       act: (b) => b.add(const RefreshFeed()),
       expect: () => [
         const NewsFeedLoading(),
-        NewsFeedLoaded(articles: tArticles),
+        NewsFeedLoaded(articles: tArticles, totalResults: 100),
       ],
     );
 

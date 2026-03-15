@@ -49,7 +49,5 @@ app.*.map.json
 /.idea/
 /android/.idea/
 
-*.gitkeep
-
 /plans
 .claude

@@ -10,6 +10,6 @@ class GetLatestArticlesUseCase {
 
   const GetLatestArticlesUseCase(this.repository);
 
-  Future<Either<Failure, List<Article>>> call(int page) =>
+  Future<Either<Failure, (List<Article>, int)>> call(int page) =>
       repository.getLatestArticles(page);
 }

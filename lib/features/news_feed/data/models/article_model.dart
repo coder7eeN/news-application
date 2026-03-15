@@ -39,16 +39,16 @@ class ArticleModel extends Article {
     required this.sourceName,
     this.author,
   }) : super(
-          id: id,
-          title: title,
-          description: description,
-          urlToImage: urlToImage,
-          url: url,
-          content: content,
-          publishedAt: publishedAt,
-          sourceName: sourceName,
-          author: author,
-        );
+         id: id,
+         title: title,
+         description: description,
+         urlToImage: urlToImage,
+         url: url,
+         content: content,
+         publishedAt: publishedAt,
+         sourceName: sourceName,
+         author: author,
+       );
 
   /// Map news API response JSON to model
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
@@ -62,24 +62,12 @@ class ArticleModel extends Article {
       url: url,
       content: json['content'] as String?,
       publishedAt:
-      DateTime.tryParse((json['publishedAt'] as String?) ?? '') ??
+          DateTime.tryParse((json['publishedAt'] as String?) ?? '') ??
           DateTime.now(),
       sourceName:
-      ((json['source'] as Map<String, dynamic>?)?['name'] as String?) ??
+          ((json['source'] as Map<String, dynamic>?)?['name'] as String?) ??
           'Unknown',
       author: json['author'] as String?,
     );
   }
-
-  /// Convert ArticleModel to JSON for API requests
-  Map<String, dynamic> toJson() => {
-        'url': url,
-        'title': title,
-        'description': description,
-        'urlToImage': urlToImage,
-        'content': content,
-        'publishedAt': publishedAt.toIso8601String(),
-        'source': {'name': sourceName},
-        'author': author,
-      };
 }
