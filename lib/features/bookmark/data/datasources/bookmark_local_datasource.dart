@@ -26,8 +26,7 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
 
   @override
   void saveBookmark(Article article) {
-    final model = _toModel(article);
-    box.put(article.id, model);
+    box.put(article.id, ArticleModel.fromEntity(article));
   }
 
   @override
@@ -38,20 +37,5 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
   @override
   bool isBookmarked(String articleId) {
     return box.containsKey(articleId);
-  }
-
-  ArticleModel _toModel(Article article) {
-    if (article is ArticleModel) return article;
-    return ArticleModel(
-      id: article.id,
-      title: article.title,
-      description: article.description,
-      urlToImage: article.urlToImage,
-      url: article.url,
-      content: article.content,
-      publishedAt: article.publishedAt,
-      sourceName: article.sourceName,
-      author: article.author,
-    );
   }
 }

@@ -50,6 +50,22 @@ class ArticleModel extends Article {
          author: author,
        );
 
+  /// Convert a domain [Article] entity to a serializable [ArticleModel]
+  factory ArticleModel.fromEntity(Article article) {
+    if (article is ArticleModel) return article;
+    return ArticleModel(
+      id: article.id,
+      title: article.title,
+      description: article.description,
+      urlToImage: article.urlToImage,
+      url: article.url,
+      content: article.content,
+      publishedAt: article.publishedAt,
+      sourceName: article.sourceName,
+      author: article.author,
+    );
+  }
+
   /// Map news API response JSON to model
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     final url = (json['url'] as String?) ?? '';
