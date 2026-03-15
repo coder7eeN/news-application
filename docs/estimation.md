@@ -1,5 +1,5 @@
 # Flutter News App — Estimation Document
-> Based on Technical Plan v5.0
+> Based on Technical Plan Final
 
 ---
 
