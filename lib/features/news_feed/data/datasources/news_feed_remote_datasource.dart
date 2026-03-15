@@ -5,10 +5,11 @@ import 'package:news_app/features/news_feed/data/models/article_model.dart';
 
 /// Abstract interface for news feed remote data operations
 abstract class NewsFeedRemoteDataSource {
-  /// Fetch top headlines articles from NewsAPI
+  /// Fetch articles from NewsAPI
+  /// Returns (articles, totalResults)
   /// Throws [ServerException] on API errors
   /// Throws [TimeoutException] on timeout
-  Future<List<ArticleModel>> fetchArticles(int page);
+  Future<(List<ArticleModel>, int)> fetchArticles(int page);
 }
 
 /// Implementation of NewsFeedRemoteDataSource using Dio
@@ -18,7 +19,7 @@ class NewsFeedRemoteDataSourceImpl implements NewsFeedRemoteDataSource {
   const NewsFeedRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<List<ArticleModel>> fetchArticles(int page) async {
+  Future<(List<ArticleModel>, int)> fetchArticles(int page) async {
     try {
       final now = DateTime.now();
       final lastMonth = DateTime(now.year, now.month - 1, now.day);
@@ -35,16 +36,21 @@ class NewsFeedRemoteDataSourceImpl implements NewsFeedRemoteDataSource {
           'page': page,
         },
       );
-      final articles = response.data?['articles'] as List<dynamic>?;
+
+      final data = response.data;
+      final articles = data?['articles'] as List<dynamic>?;
+      final totalResults = data?['totalResults'] as int? ?? 0;
+
       if (articles == null) {
         throw const ServerException('Invalid response format');
       }
 
-      return articles
+      final models = articles
           .map((json) => ArticleModel.fromJson(json as Map<String, dynamic>))
           .toList();
+
+      return (models, totalResults);
     } on DioException catch (e) {
-      // ErrorInterceptor maps DioException → AppException in e.error
       final mappedError = e.error;
       if (mappedError is AppException) {
         throw mappedError;

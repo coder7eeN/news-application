@@ -1,6 +1,5 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/core/cache/cache_constants.dart';
 import 'package:news_app/features/news_feed/domain/usecases/get_latest_articles.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_event.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_state.dart';
@@ -39,12 +38,17 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
           paginationError: failure.message,
         ),
       ),
-      (newArticles) {
+      (data) {
+        final (newArticles, totalResults) = data;
+        final allArticles = [...currentState.articles, ...newArticles];
         _currentPage++;
         emit(
           NewsFeedLoaded(
-            articles: [...currentState.articles, ...newArticles],
-            hasReachedMax: newArticles.length < CacheConstants.pageSize,
+            articles: allArticles,
+            totalResults: totalResults,
+            hasReachedMax: totalResults > 0
+                ? allArticles.length >= totalResults
+                : allArticles.length == currentState.articles.length,
           ),
         );
       },
@@ -62,14 +66,21 @@ class NewsFeedBloc extends Bloc<NewsFeedEvent, NewsFeedState> {
   Future<void> _fetchFirstPage(Emitter<NewsFeedState> emit) async {
     emit(const NewsFeedLoading());
     final result = await getLatestArticles(1);
-    result.fold((failure) => emit(NewsFeedError(failure.message)), (articles) {
-      _currentPage = 2;
-      emit(
-        NewsFeedLoaded(
-          articles: articles,
-          hasReachedMax: articles.length < CacheConstants.pageSize,
-        ),
-      );
-    });
+    result.fold(
+      (failure) => emit(NewsFeedError(failure.message)),
+      (data) {
+        final (articles, totalResults) = data;
+        _currentPage = 2;
+        emit(
+          NewsFeedLoaded(
+            articles: articles,
+            totalResults: totalResults,
+            hasReachedMax: totalResults > 0
+                ? articles.length >= totalResults
+                : false,
+          ),
+        );
+      },
+    );
   }
 }

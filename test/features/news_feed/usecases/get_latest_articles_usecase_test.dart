@@ -36,56 +36,50 @@ void main() {
 
   group('call', () {
     test('should return list of articles on success', () async {
-      // arrange
       when(() => mockRepository.getLatestArticles(any()))
-          .thenAnswer((_) async => Right(tArticles));
+          .thenAnswer((_) async => Right((tArticles, 100)));
 
-      // act
       final result = await useCase(1);
 
-      // assert
-      expect(result, Right<Failure, List<Article>>(tArticles));
+      expect(result, Right<Failure, (List<Article>, int)>((tArticles, 100)));
       verify(() => mockRepository.getLatestArticles(1)).called(1);
       verifyNoMoreInteractions(mockRepository);
     });
 
     test('should return ServerFailure when repository fails', () async {
-      // arrange
       const tFailure = ServerFailure();
       when(() => mockRepository.getLatestArticles(any()))
           .thenAnswer((_) async => const Left(tFailure));
 
-      // act
       final result = await useCase(1);
 
-      // assert
-      expect(result, const Left<Failure, List<Article>>(tFailure));
+      expect(
+        result,
+        const Left<Failure, (List<Article>, int)>(tFailure),
+      );
       verify(() => mockRepository.getLatestArticles(1)).called(1);
       verifyNoMoreInteractions(mockRepository);
     });
 
     test('should return NoInternetFailure when offline', () async {
-      // arrange
       const tFailure = NoInternetFailure();
       when(() => mockRepository.getLatestArticles(any()))
           .thenAnswer((_) async => const Left(tFailure));
 
-      // act
       final result = await useCase(1);
 
-      // assert
-      expect(result, const Left<Failure, List<Article>>(tFailure));
+      expect(
+        result,
+        const Left<Failure, (List<Article>, int)>(tFailure),
+      );
     });
 
     test('should pass correct page parameter to repository', () async {
-      // arrange
       when(() => mockRepository.getLatestArticles(any()))
-          .thenAnswer((_) async => Right(tArticles));
+          .thenAnswer((_) async => Right((tArticles, 100)));
 
-      // act
       await useCase(2);
 
-      // assert
       verify(() => mockRepository.getLatestArticles(2)).called(1);
       verifyNoMoreInteractions(mockRepository);
     });

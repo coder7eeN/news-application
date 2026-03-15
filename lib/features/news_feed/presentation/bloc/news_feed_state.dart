@@ -21,12 +21,14 @@ class NewsFeedLoading extends NewsFeedState {
 
 class NewsFeedLoaded extends NewsFeedState {
   final List<Article> articles;
+  final int totalResults;
   final bool hasReachedMax;
   final bool isLoadingMore;
   final String? paginationError;
 
   const NewsFeedLoaded({
     required this.articles,
+    this.totalResults = 0,
     this.hasReachedMax = false,
     this.isLoadingMore = false,
     this.paginationError,
@@ -34,12 +36,14 @@ class NewsFeedLoaded extends NewsFeedState {
 
   NewsFeedLoaded copyWith({
     List<Article>? articles,
+    int? totalResults,
     bool? hasReachedMax,
     bool? isLoadingMore,
     String? paginationError,
   }) {
     return NewsFeedLoaded(
       articles: articles ?? this.articles,
+      totalResults: totalResults ?? this.totalResults,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       paginationError: paginationError,
@@ -48,7 +52,7 @@ class NewsFeedLoaded extends NewsFeedState {
 
   @override
   List<Object?> get props =>
-      [articles, hasReachedMax, isLoadingMore, paginationError];
+      [articles, totalResults, hasReachedMax, isLoadingMore, paginationError];
 }
 
 class NewsFeedError extends NewsFeedState {

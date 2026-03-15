@@ -63,19 +63,19 @@ void main() {
     test('returns cached articles immediately when cache is valid', () async {
       when(() => mockLocal.getCachedArticles(1)).thenReturn(tCachedFeed);
       when(() => mockRemote.fetchArticles(any()))
-          .thenAnswer((_) async => tArticleModels);
+          .thenAnswer((_) async => (tArticleModels, 100));
       stubCacheArticles();
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Right<Failure, List<Article>>>());
+      expect(result, isA<Right<Failure, (List<Article>, int)>>());
       verify(() => mockLocal.getCachedArticles(1)).called(1);
     });
 
     test('triggers background refresh on valid cache hit', () async {
       when(() => mockLocal.getCachedArticles(1)).thenReturn(tCachedFeed);
       when(() => mockRemote.fetchArticles(1))
-          .thenAnswer((_) async => tArticleModels);
+          .thenAnswer((_) async => (tArticleModels, 100));
       stubCacheArticles();
 
       await repository.getLatestArticles(1);
@@ -91,12 +91,12 @@ void main() {
       when(() => mockLocal.getCachedArticles(1)).thenReturn(null);
       when(() => mockNetwork.isConnected).thenAnswer((_) async => true);
       when(() => mockRemote.fetchArticles(1))
-          .thenAnswer((_) async => tArticleModels);
+          .thenAnswer((_) async => (tArticleModels, 100));
       stubCacheArticles();
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Right<Failure, List<Article>>>());
+      expect(result, isA<Right<Failure, (List<Article>, int)>>());
       verify(() => mockLocal.cacheArticles(1, tArticleModels)).called(1);
     });
   });
@@ -107,12 +107,12 @@ void main() {
           .thenReturn(tExpiredCachedFeed);
       when(() => mockNetwork.isConnected).thenAnswer((_) async => true);
       when(() => mockRemote.fetchArticles(1))
-          .thenAnswer((_) async => tArticleModels);
+          .thenAnswer((_) async => (tArticleModels, 100));
       stubCacheArticles();
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Right<Failure, List<Article>>>());
+      expect(result, isA<Right<Failure, (List<Article>, int)>>());
       verify(() => mockRemote.fetchArticles(1)).called(1);
     });
 
@@ -121,7 +121,7 @@ void main() {
           .thenReturn(tExpiredCachedFeed);
       when(() => mockNetwork.isConnected).thenAnswer((_) async => true);
       when(() => mockRemote.fetchArticles(1))
-          .thenAnswer((_) async => tArticleModels);
+          .thenAnswer((_) async => (tArticleModels, 100));
       stubCacheArticles();
 
       await repository.getLatestArticles(1);
@@ -139,7 +139,7 @@ void main() {
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Right<Failure, List<Article>>>());
+      expect(result, isA<Right<Failure, (List<Article>, int)>>());
       verifyNever(() => mockRemote.fetchArticles(any()));
     });
 
@@ -151,7 +151,7 @@ void main() {
 
       expect(
         result,
-        const Left<Failure, List<Article>>(NoInternetFailure()),
+        const Left<Failure, (List<Article>, int)>(NoInternetFailure()),
       );
     });
   });
@@ -165,7 +165,7 @@ void main() {
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Left<Failure, List<Article>>>());
+      expect(result, isA<Left<Failure, (List<Article>, int)>>());
     });
 
     test('returns TimeoutFailure on TimeoutException', () async {
@@ -178,7 +178,7 @@ void main() {
 
       expect(
         result,
-        const Left<Failure, List<Article>>(TimeoutFailure()),
+        const Left<Failure, (List<Article>, int)>(TimeoutFailure()),
       );
     });
 
@@ -191,31 +191,7 @@ void main() {
 
       final result = await repository.getLatestArticles(1);
 
-      expect(result, isA<Right<Failure, List<Article>>>());
-    });
-  });
-
-  group('searchArticles', () {
-    test('returns articles from remote (never cached)', () async {
-      when(() => mockNetwork.isConnected).thenAnswer((_) async => true);
-      when(() => mockRemote.fetchArticles(1))
-          .thenAnswer((_) async => tArticleModels);
-
-      final result = await repository.searchArticles('test');
-
-      expect(result, isA<Right<Failure, List<Article>>>());
-      verifyNever(() => mockLocal.getCachedArticles(any()));
-    });
-
-    test('returns NoInternetFailure when offline', () async {
-      when(() => mockNetwork.isConnected).thenAnswer((_) async => false);
-
-      final result = await repository.searchArticles('test');
-
-      expect(
-        result,
-        const Left<Failure, List<Article>>(NoInternetFailure()),
-      );
+      expect(result, isA<Right<Failure, (List<Article>, int)>>());
     });
   });
 }

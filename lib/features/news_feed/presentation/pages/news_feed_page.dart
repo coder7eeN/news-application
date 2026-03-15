@@ -9,6 +9,7 @@ import 'package:news_app/features/news_feed/presentation/bloc/news_feed_bloc.dar
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_event.dart';
 import 'package:news_app/features/news_feed/presentation/bloc/news_feed_state.dart';
 import 'package:news_app/features/news_feed/presentation/widgets/article_card.dart';
+import 'package:news_app/core/widgets/shimmer_list.dart';
 
 class NewsFeedPage extends StatelessWidget {
   const NewsFeedPage({super.key});
@@ -96,13 +97,12 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
       },
       builder: (context, state) {
         if (state is NewsFeedLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const ShimmerList();
         }
         if (state is NewsFeedLoaded) {
-          final itemCount =
-              state.isLoadingMore
-                  ? state.articles.length + 1
-                  : state.articles.length;
+          final itemCount = state.isLoadingMore
+              ? state.articles.length + 1
+              : state.articles.length;
           return RefreshIndicator(
             onRefresh: () async {
               final bloc = context.read<NewsFeedBloc>();
@@ -131,10 +131,8 @@ class _NewsFeedViewState extends State<_NewsFeedView> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: ArticleCard(
                     article: article,
-                    onTap: () => context.push(
-                      AppRouter.articleDetail,
-                      extra: article,
-                    ),
+                    onTap: () =>
+                        context.push(AppRouter.articleDetail, extra: article),
                   ),
                 );
               },

@@ -24,63 +24,52 @@ class NewsFeedRepositoryImpl implements INewsFeedRepository {
   });
 
   @override
-  Future<Either<Failure, List<Article>>> getLatestArticles(int page) async {
-    // 1. Check local cache
+  Future<Either<Failure, (List<Article>, int)>> getLatestArticles(
+    int page,
+  ) async {
+    // Check local cache
     final cached = localDataSource.getCachedArticles(page);
 
     if (cached != null && !cached.isExpired) {
       // Valid cache — return immediately, refresh in background
+      // totalResults is unknown from cache, use 0 to signal unknown
       unawaited(_refreshInBackground(page));
-      return Right(cached.articles);
+      return Right((cached.articles, 0));
     }
 
-    // 2. Cache miss or expired — check connectivity
+    // Cache miss or expired — check connectivity
     if (!await networkInfo.isConnected) {
       // Offline — return stale cache if available
       if (cached != null) {
-        return Right(cached.articles);
+        return Right((cached.articles, 0));
       }
       return const Left(NoInternetFailure());
     }
 
-    // 3. Fetch from remote
+    // Fetch from remote
     try {
-      final articles = await remoteDataSource.fetchArticles(page);
+      final (articles, totalResults) = await remoteDataSource.fetchArticles(
+        page,
+      );
       unawaited(localDataSource.cacheArticles(page, articles));
-      return Right(articles);
+      return Right((articles, totalResults));
     } on ServerException catch (e) {
       // Fall back to stale cache on remote failure
       if (cached != null) {
-        return Right(cached.articles);
+        return Right((cached.articles, 0));
       }
       return Left(ServerFailure(e.message));
     } on TimeoutException {
       if (cached != null) {
-        return Right(cached.articles);
+        return Right((cached.articles, 0));
       }
-      return const Left(TimeoutFailure());
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<Article>>> searchArticles(String query) async {
-    if (!await networkInfo.isConnected) {
-      return const Left(NoInternetFailure());
-    }
-
-    try {
-      final articles = await remoteDataSource.fetchArticles(1);
-      return Right(articles);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on TimeoutException {
       return const Left(TimeoutFailure());
     }
   }
 
   Future<void> _refreshInBackground(int page) async {
     try {
-      final articles = await remoteDataSource.fetchArticles(page);
+      final (articles, _) = await remoteDataSource.fetchArticles(page);
       await localDataSource.cacheArticles(page, articles);
     } on ServerException {
       // Swallow — background refresh failing is not user-facing
