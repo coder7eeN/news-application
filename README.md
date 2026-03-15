@@ -13,8 +13,8 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 ## Table of Contents
 
 - [Demo](#demo)
-- [API Documentation](#api-documentation)
 - [Setup Instructions](#setup-instructions)
+- [API Documentation](#api-documentation)
 - [Architecture & State Management](#architecture--state-management)
 - [Planning Process & Task Breakdown](#planning-process--task-breakdown)
 - [Git Workflow & Strategy](#git-workflow--strategy)
@@ -30,15 +30,6 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 ### Screen Recording
 
 Download the demo video from the [`screenshots/`](screenshots/) folder: [`demo.mp4`](screenshots/demo.mp4)
-
----
-
-## API Documentation
-
-This project uses [NewsAPI](https://newsapi.org/) as the data source.
-
-- Official API reference: [NewsAPI Docs](https://newsapi.org/docs)
-- Local endpoint documentation: [`docs/newsapi-everything-docs.md`](docs/newsapi-everything-docs.md)
 
 ---
 
@@ -76,6 +67,15 @@ flutter test test/features/ --coverage
 # Run lint
 flutter analyze --fatal-infos
 ```
+
+---
+
+## API Documentation
+
+This project uses [NewsAPI](https://newsapi.org/) as the data source.
+
+- Official API reference: [NewsAPI Docs](https://newsapi.org/docs)
+- Local endpoint documentation: [`docs/newsapi-everything-docs.md`](docs/newsapi-everything-docs.md)
 
 ---
 
