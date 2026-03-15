@@ -29,7 +29,7 @@ A production-ready Flutter news application built on **Clean Architecture + MVVM
 
 ### Screen Recording
 
-<video src="screenshots/demo.mp4" controls width="300"></video>
+Download the demo video from the [`screenshots/`](screenshots/) folder: [`demo.mp4`](screenshots/demo.mp4)
 
 ---
 
