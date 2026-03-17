@@ -361,4 +361,4 @@ AI-assisted modules, prompt log, code review reflection, and lessons learned.
 | [`docs/code_style_reference.md`](docs/code_style_reference.md)       | Lint rules, naming conventions, import order                  |
 | [`docs/newsapi-everything-docs.md`](docs/newsapi-everything-docs.md) | NewsAPI `/v2/everything` endpoint documentation               |
 | [`docs/ai_transparency_log.md`](docs/ai_transparency_log.md)         | Full AI usage disclosure and reflection                       |
-| [`docs/prompt_log.md`](docs/ai_transparency_log.md)                  | Prompt log                                                    |
+| [`docs/prompt_log.md`](docs/prompt_log.md)                           | Prompt log                                                    |
